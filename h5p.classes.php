@@ -795,7 +795,7 @@ class H5PValidator {
       if (in_array(substr($file, 0, 1), array('.', '_'))) {
         continue;
       }
-      $filePath = $tmpDir . DIRECTORY_SEPARATOR . $file;
+      $filePath = $tmpDir . '/' . $file;
       // Check for h5p.json file.
       if (strtolower($file) == 'h5p.json') {
         if ($skipContent === TRUE) {
@@ -829,7 +829,7 @@ class H5PValidator {
           $valid = FALSE;
           continue;
         }
-        $contentJsonData = $this->getJsonData($filePath . DIRECTORY_SEPARATOR . 'content.json');
+        $contentJsonData = $this->getJsonData($filePath . '/' . 'content.json');
         if ($contentJsonData === FALSE) {
           $this->h5pF->setErrorMessage($this->h5pF->t('Could not find or parse the content.json file'), 'invalid-content-json-file');
           $valid = FALSE;
@@ -977,14 +977,14 @@ class H5PValidator {
       $this->h5pF->setErrorMessage($this->h5pF->t('Invalid library name: %name', array('%name' => $file)), 'invalid-library-name');
       return FALSE;
     }
-    $h5pData = $this->getJsonData($filePath . DIRECTORY_SEPARATOR . 'library.json');
+    $h5pData = $this->getJsonData($filePath . '/' . 'library.json');
     if ($h5pData === FALSE) {
       $this->h5pF->setErrorMessage($this->h5pF->t('Could not find library.json file with valid json format for library %name', array('%name' => $file)), 'invalid-library-json-file');
       return FALSE;
     }
 
     // validate json if a semantics file is provided
-    $semanticsPath = $filePath . DIRECTORY_SEPARATOR . 'semantics.json';
+    $semanticsPath = $filePath . '/' . 'semantics.json';
     if (file_exists($semanticsPath)) {
       $semantics = $this->getJsonData($semanticsPath, TRUE);
       if ($semantics === FALSE) {
@@ -997,7 +997,7 @@ class H5PValidator {
     }
 
     // validate language folder if it exists
-    $languagePath = $filePath . DIRECTORY_SEPARATOR . 'language';
+    $languagePath = $filePath . '/' . 'language';
     if (is_dir($languagePath)) {
       $languageFiles = scandir($languagePath);
       foreach ($languageFiles as $languageFile) {
@@ -1008,7 +1008,7 @@ class H5PValidator {
           $this->h5pF->setErrorMessage($this->h5pF->t('Invalid language file %file in library %library', array('%file' => $languageFile, '%library' => $file)), 'invalid-language-file');
           return FALSE;
         }
-        $languageJson = $this->getJsonData($languagePath . DIRECTORY_SEPARATOR . $languageFile, TRUE);
+        $languageJson = $this->getJsonData($languagePath . '/' . $languageFile, TRUE);
         if ($languageJson === FALSE) {
           $this->h5pF->setErrorMessage($this->h5pF->t('Invalid language file %languageFile has been included in the library %name', array('%languageFile' => $languageFile, '%name' => $file)), 'invalid-language-file');
           return FALSE;
@@ -1019,7 +1019,7 @@ class H5PValidator {
     }
 
     // Check for icon:
-    $h5pData['hasIcon'] = file_exists($filePath . DIRECTORY_SEPARATOR . 'icon.svg');
+    $h5pData['hasIcon'] = file_exists($filePath . '/' . 'icon.svg');
 
     $validLibrary = $this->isValidH5pData($h5pData, $file, $this->libraryRequired, $this->libraryOptional);
 
@@ -1103,8 +1103,8 @@ class H5PValidator {
    */
   private function isExistingFiles($files, $tmpDir, $library) {
     foreach ($files as $file) {
-      $path = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $file['path']);
-      if (!file_exists($tmpDir . DIRECTORY_SEPARATOR . $library . DIRECTORY_SEPARATOR . $path)) {
+      $path = str_replace(array('/', '\\'), '/', $file['path']);
+      if (!file_exists($tmpDir . '/' . $library . '/' . $path)) {
         $this->h5pF->setErrorMessage($this->h5pF->t('The file "%file" is missing from library: "%name"', array('%file' => $path, '%name' => $library)), 'library-missing-file');
         return FALSE;
       }
@@ -1395,7 +1395,7 @@ class H5PStorage {
 
     if (!$skipContent) {
       $basePath = $this->h5pF->getUploadedH5pFolderPath();
-      $current_path = $basePath . DIRECTORY_SEPARATOR . 'content';
+      $current_path = $basePath . '/' . 'content';
 
       // Save content
       if ($content === NULL) {
@@ -1414,7 +1414,7 @@ class H5PStorage {
         }
       }
 
-      $content['params'] = file_get_contents($current_path . DIRECTORY_SEPARATOR . 'content.json');
+      $content['params'] = file_get_contents($current_path . '/' . 'content.json');
 
       if (isset($options['disable'])) {
         $content['disable'] = $options['disable'];
@@ -1786,7 +1786,7 @@ Class H5PExport {
    */
   private static function populateFileList($dir, &$files, $relative = '') {
     $strip = strlen($dir) + 1;
-    $contents = glob($dir . DIRECTORY_SEPARATOR . '*');
+    $contents = glob($dir . '/' . '*');
     if (!empty($contents)) {
       foreach ($contents as $file) {
         $rel = $relative . substr($file, $strip);
@@ -3561,7 +3561,7 @@ class H5PContentValidator {
     $wl_regex = '/\.(' . preg_replace('/ +/i', '|', preg_quote($whitelist)) . ')$/i';
 
     foreach ($files as $file) {
-      $filePath = $contentPath . DIRECTORY_SEPARATOR . $file;
+      $filePath = $contentPath . '/' . $file;
       if (is_dir($filePath)) {
         $valid = $this->validateContentFiles($filePath, $isLibrary) && $valid;
       }
